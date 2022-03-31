@@ -1,0 +1,19 @@
+name: Slack Username
+description: Fetch Slack Username by GitHub Associated Email
+author: 'Camis Inc'
+inputs:
+  username:
+    description: The username of the user in GitHub to fetch in Slack
+    required: true
+  github-token:
+    description: The github token used to retrieve information about the provided GitHub user 
+    required: true
+  slack-token:
+    description: The Slack API Token used to fetch Slack users
+    required: true
+outputs:
+  slack-id:
+    description: The matching Slack user's unique id
+runs:
+  using: node16
+  main: dist/index.js

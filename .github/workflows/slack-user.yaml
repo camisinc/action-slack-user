@@ -1,0 +1,19 @@
+name: Example Slack User
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+
+jobs:
+  slack-user:
+    runs-on: ubuntu-latest
+    name: Fetches Slack User from GitHub User
+    steps:
+      - name: Fetch Slack User
+        id: user
+        uses: alec-malcolm/slack-user
+        with:
+          username: ${{ github.actor }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          slack-token: ${{ secrets.SLACK_TOKEN }}
+      - run: echo "slack username - ${{ steps.user.outputs.slack-id }}"
