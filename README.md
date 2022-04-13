@@ -1,6 +1,6 @@
 # Slack User
 ## Overview
-A lightweight GitHub Action that can be used to fetch a user's slack username for usage in automated slack notifications by their associated username. This action works by taking the username in GitHub retrieving the user's email associated with the GitHub account, and then finding a slack user that's associated with that email. If one is found the slack username for that user is set as the output variable.
+A lightweight GitHub Action that can be used to fetch a user's slack username for usage in automated slack notifications by their associated GitHub username. This action works by taking the username in GitHub retrieving the user's email associated with the GitHub account, and then finding a slack user that's associated with that email. If one is found the slack username for that user is set as the output variable.
 
 ## Inputs
 * username - This should match the github.actor property of the job that is using this action.
