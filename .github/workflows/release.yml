@@ -1,0 +1,40 @@
+name: Slack User Release
+
+on: 
+  push: 
+    branches: 
+      - main
+    paths:
+      - '.github/workflows/release.yml'
+      - 'src/**'
+      - 'dist/**'
+
+jobs:
+  name: Create a Release
+  runs-on: ubuntu-latest
+
+  steps:
+    - name: Checkout Branch
+      uses: actions/checkout@v2
+      with:
+        ref: ${{ github.sha }}
+        fetch-depth: 0
+
+    - name: Install GitVersion Tool
+      uses: gittools/actions/gitversion/setup@v0.9.11
+      with:
+        versionSpec: '5.8.1'
+
+    - name: Calculate SemVer
+      id:   gitversion
+      uses: gittools/actions/gitversion/execute@v0.9.11
+      with:
+        useConfigFile: true
+        configFilePath: GitVersion.yml
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        target_commitish: ${{ github.sha }}
+        tag_name: v${{ steps.gitversion.outputs.semVer }}
+        generate_release_notes: true
