@@ -31,7 +31,7 @@ async function fetchGitHubEmail(username, token) {
  * @param {*} token A Slack API Token used to retrieve user's from a slack organization.
  * @returns A username in slack that's associated with the provided email
  */
-async function fetchSlackUsername(email, token) {
+async function fetchSlackMemberId(email, token) {
     try {
         // Initialize an instance of the slack web client.
         const web = new WebClient(token);
@@ -49,14 +49,14 @@ async function fetchSlackUsername(email, token) {
             core.setFailed('Could not find an associated slack user');
             return undefined;
         }
-        return user.name;
+        return user.id;
     } catch (err) {
         return undefined;
     }
 }
 
 /**
- * Main orchestration function, takes in input from github actions and sets the output to the slack username if one was found.
+ * Main orchestration function, takes in input from github actions and sets the output to the slack member id if one was found.
  */
 (async () => {
     const username = core.getInput('username');
@@ -70,8 +70,8 @@ async function fetchSlackUsername(email, token) {
         return;
     }
     
-    // Retrieve the user's username in slack
-    const slackId = await fetchSlackUsername(email, slackToken);
+    // Retrieve the user's member id in slack
+    const slackId = await fetchSlackMemberId(email, slackToken);
     if (!slackId) {
         core.setFailed(`An error occurred fetching user from slack with email ${email}`);
         return;
