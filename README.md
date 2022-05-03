@@ -8,4 +8,5 @@ A lightweight GitHub Action that can be used to fetch a user's slack member id f
 * slack-token - This is the API Key for a Slack Instance. It will allow us to fetch a list of slack users and from there determine their slack id.
 
 ## Outputs
-* slack-id - the member id of the slack user associated with the GitHub email, can be used to mention the user in various automated notifications.
+* member-id - the member id of the slack user associated with the GitHub email.
+* username - the username of the slack user associated with the GitHub email.
