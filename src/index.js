@@ -77,5 +77,5 @@ async function fetchSlackUser(email, token) {
         return;
     }
     core.setOutput('member-id', slackUser.memberId);
-    core.setOutput('username', slackUser.userId);
+    core.setOutput('username', slackUser.username);
 })();
