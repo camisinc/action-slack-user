@@ -12,8 +12,10 @@ inputs:
     description: The Slack API Token used to fetch Slack users
     required: true
 outputs:
-  slack-id:
-    description: The matching Slack user's unique id
+  member-id:
+    description: The matching Slack user's unique member id
+  username:
+    description: The matching Slack user's username
 runs:
   using: node16
   main: dist/index.js
