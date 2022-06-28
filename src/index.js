@@ -15,6 +15,7 @@ async function fetchGitHubEmail(username, token) {
         const result = await octokit.rest.users.getByUsername({
             username
         });
+        console.log(result);
         if (!result || !result.data || !result.data.email) {
             return undefined;
         }
