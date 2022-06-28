@@ -10,3 +10,5 @@ A lightweight GitHub Action that can be used to fetch a user's slack member id f
 ## Outputs
 * member-id - the member id of the slack user associated with the GitHub email.
 * username - the username of the slack user associated with the GitHub email.
+
+asdf
