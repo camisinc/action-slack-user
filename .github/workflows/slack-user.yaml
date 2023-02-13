@@ -10,6 +10,14 @@ jobs:
     runs-on: ubuntu-latest
     name: Fetches Slack User from GitHub User
     steps:
+      # Checkout the repo
+      - name: Checkout Branch
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+
+      # Run the action defined in the repo
       - name: Fetch Slack User
         id: user
         uses: ./
