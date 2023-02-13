@@ -1,6 +1,7 @@
 name: Slack User Release
 
-on: 
+on:
+  workflow_dispatch:
   push: 
     branches: 
       - main
@@ -8,6 +9,8 @@ on:
       - '.github/workflows/release.yml'
       - 'src/**'
       - 'dist/**'
+      - 'action.yml'
+      - 'GitVersion.yml'
 
 jobs:
   release:

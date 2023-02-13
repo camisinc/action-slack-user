@@ -12,7 +12,7 @@ jobs:
     steps:
       - name: Fetch Slack User
         id: user
-        uses: camisinc/action-slack-user@main
+        uses: ./
         with:
           username: ${{ github.actor }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
