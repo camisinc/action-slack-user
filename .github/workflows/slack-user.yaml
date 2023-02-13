@@ -10,9 +10,17 @@ jobs:
     runs-on: ubuntu-latest
     name: Fetches Slack User from GitHub User
     steps:
+      # Checkout the repo
+      - name: Checkout Branch
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+
+      # Run the action defined in the repo
       - name: Fetch Slack User
         id: user
-        uses: camisinc/action-slack-user@main
+        uses: ./
         with:
           username: ${{ github.actor }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
