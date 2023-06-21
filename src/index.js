@@ -12,14 +12,10 @@ async function fetchGitHubEmail(username, token) {
     try {
         const octokit = github.getOctokit(token);
         // Fetch the user information by the provided GitHub username.
-        const result = await octokit.rest.users.getByUsername({
-            username
-        });
-        if (!result || !result.data || !result.data.email) {
-            return undefined;
-        }
+        const result = await octokit.rest.users.list();
+        const user = result.data.find(user => user.login === username);
         // Set the email to the one just retrieved from GitHub.
-        return result.data.email;
+        return user.email;
     } catch (err) {
         return undefined;
     }
@@ -44,7 +40,7 @@ async function fetchSlackUser(email, token) {
         }
 
         // Find the slack user associated with the github email address
-        const user = result.members.find( member => member.profile.email === email);
+        const user = result.members.find(member => member.profile.email === email);
         if (!user) {
             core.setFailed('Could not find an associated slack user');
             return undefined;
