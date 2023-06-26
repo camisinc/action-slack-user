@@ -18833,37 +18833,94 @@ module.exports = JSON.parse('[[[0,44],"disallowed_STD3_valid"],[[45,46],"valid"]
 /******/ 	}
 /******/ 	
 /************************************************************************/
+/******/ 	/* webpack/runtime/compat get default export */
+/******/ 	(() => {
+/******/ 		// getDefaultExport function for compatibility with non-harmony modules
+/******/ 		__nccwpck_require__.n = (module) => {
+/******/ 			var getter = module && module.__esModule ?
+/******/ 				() => (module['default']) :
+/******/ 				() => (module);
+/******/ 			__nccwpck_require__.d(getter, { a: getter });
+/******/ 			return getter;
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/define property getters */
+/******/ 	(() => {
+/******/ 		// define getter functions for harmony exports
+/******/ 		__nccwpck_require__.d = (exports, definition) => {
+/******/ 			for(var key in definition) {
+/******/ 				if(__nccwpck_require__.o(definition, key) && !__nccwpck_require__.o(exports, key)) {
+/******/ 					Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
+/******/ 				}
+/******/ 			}
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/hasOwnProperty shorthand */
+/******/ 	(() => {
+/******/ 		__nccwpck_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/make namespace object */
+/******/ 	(() => {
+/******/ 		// define __esModule on exports
+/******/ 		__nccwpck_require__.r = (exports) => {
+/******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 			}
+/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 		};
+/******/ 	})();
+/******/ 	
 /******/ 	/* webpack/runtime/compat */
 /******/ 	
 /******/ 	if (typeof __nccwpck_require__ !== 'undefined') __nccwpck_require__.ab = __dirname + "/";
 /******/ 	
 /************************************************************************/
 var __webpack_exports__ = {};
-// This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
+// This entry need to be wrapped in an IIFE because it need to be in strict mode.
 (() => {
-const { WebClient } = __nccwpck_require__(431);
-const core = __nccwpck_require__(2186);
-const github = __nccwpck_require__(5438);
+"use strict";
+__nccwpck_require__.r(__webpack_exports__);
+/* harmony import */ var _actions_core__WEBPACK_IMPORTED_MODULE_0__ = __nccwpck_require__(2186);
+/* harmony import */ var _actions_core__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__nccwpck_require__.n(_actions_core__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _slack_web_api__WEBPACK_IMPORTED_MODULE_1__ = __nccwpck_require__(431);
+/* harmony import */ var _slack_web_api__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__nccwpck_require__.n(_slack_web_api__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _actions_github__WEBPACK_IMPORTED_MODULE_2__ = __nccwpck_require__(5438);
+/* harmony import */ var _actions_github__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__nccwpck_require__.n(_actions_github__WEBPACK_IMPORTED_MODULE_2__);
+
+
+
 
 /**
  * Given a user's username in GitHub the user's email is retrieved
- * @param {*} username A username associated with a user in GitHub.
  * @param {*} token GitHub Personal Access Token, used to interact with the GitHub REST API
  * @returns The GitHub user's email address
  */
-async function fetchGitHubEmail(username, token) {
+async function fetchGitHubEmail(token) {
     try {
-        const octokit = github.getOctokit(token);
-        // Fetch the user information by the provided GitHub username.
-        const result = await octokit.rest.users.getByUsername({
-            username
+        const octokit = (0,_actions_github__WEBPACK_IMPORTED_MODULE_2__.getOctokit)(token);
+        // Fetch commit from GitHub
+        const data = await octokit.rest.repos.getCommit({
+            owner: _actions_github__WEBPACK_IMPORTED_MODULE_2__.context.repo.owner,
+            repo: _actions_github__WEBPACK_IMPORTED_MODULE_2__.context.repo.repo,
+            ref: _actions_github__WEBPACK_IMPORTED_MODULE_2__.context.sha
         });
-        if (!result || !result.data || !result.data.email) {
+
+        if (!data) {
+            _actions_core__WEBPACK_IMPORTED_MODULE_0__.setFailed('An error occurred fetching the commit from GitHub');
             return undefined;
         }
-        // Set the email to the one just retrieved from GitHub.
-        return result.data.email;
+        _actions_core__WEBPACK_IMPORTED_MODULE_0__.debug(`commit: ${JSON.stringify(data)}`);
+        // Retrieve the email address associated with the commit
+        const email = data.data.commit.author.email;
+        if (!email) {
+            _actions_core__WEBPACK_IMPORTED_MODULE_0__.setFailed("Could not find an email address associated with the commit");
+        }
+        return email;
     } catch (err) {
+        _actions_core__WEBPACK_IMPORTED_MODULE_0__.setFailed(`error: ${err}`);
         return undefined;
     }
 }
@@ -18877,23 +18934,24 @@ async function fetchGitHubEmail(username, token) {
 async function fetchSlackUser(email, token) {
     try {
         // Initialize an instance of the slack web client.
-        const web = new WebClient(token);
+        const web = new _slack_web_api__WEBPACK_IMPORTED_MODULE_1__.WebClient(token);
 
         // Fetch all slack users
         const result = await web.users.list();
         if (!result.ok) {
-            core.setFailed('An error occurred fetching users from slack');
+            _actions_core__WEBPACK_IMPORTED_MODULE_0__.setFailed('An error occurred fetching users from slack');
             return undefined;
         }
 
         // Find the slack user associated with the github email address
-        const user = result.members.find( member => member.profile.email === email);
+        const user = result.members.find(member => member.profile.email === email);
         if (!user) {
-            core.setFailed('Could not find an associated slack user');
+            _actions_core__WEBPACK_IMPORTED_MODULE_0__.setFailed(`Could not find an associated slack user ${email}`);
             return undefined;
         }
         return { memberId: user.id, username: user.name};
     } catch (err) {
+        _actions_core__WEBPACK_IMPORTED_MODULE_0__.setFailed(`error: ${err}`)
         return undefined;
     }
 }
@@ -18902,25 +18960,24 @@ async function fetchSlackUser(email, token) {
  * Main orchestration function, takes in input from github actions and sets the output to the slack member id if one was found.
  */
 (async () => {
-    const username = core.getInput('username');
-    const githubToken = core.getInput('github-token');
-    const slackToken = core.getInput('slack-token');
+    const githubToken = _actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput('github-token');
+    const slackToken = _actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput('slack-token');
 
     // Retrieve the user's email in GitHub
-    const email = await fetchGitHubEmail(username, githubToken);
+    const email = await fetchGitHubEmail(githubToken);
     if (!email) {
-        core.setFailed(`Failed to set email for github user ${username}`);
+        _actions_core__WEBPACK_IMPORTED_MODULE_0__.setFailed(`Failed to find email associated with commit`);
         return;
     }
     
     // Retrieve the user's member id in slack
     const slackUser = await fetchSlackUser(email, slackToken);
     if (!slackUser) {
-        core.setFailed(`An error occurred fetching user from slack with email ${email}`);
+        _actions_core__WEBPACK_IMPORTED_MODULE_0__.setFailed(`An error occurred fetching user from slack with email ${email}`);
         return;
     }
-    core.setOutput('member-id', slackUser.memberId);
-    core.setOutput('username', slackUser.username);
+    _actions_core__WEBPACK_IMPORTED_MODULE_0__.setOutput('member-id', slackUser.memberId);
+    _actions_core__WEBPACK_IMPORTED_MODULE_0__.setOutput('username', slackUser.username);
 })();
 })();
 
