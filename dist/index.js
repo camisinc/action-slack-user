@@ -18870,6 +18870,7 @@ async function fetchGitHubEmail(repo, owner, ref, token) {
         }
         return email;
     } catch (err) {
+        core.setFailed(`error: ${err}`);
         return undefined;
     }
 }
@@ -18900,6 +18901,7 @@ async function fetchSlackUser(email, token) {
         }
         return { memberId: user.id, username: user.name};
     } catch (err) {
+        core.setFailed(`error: ${err}`)
         return undefined;
     }
 }
