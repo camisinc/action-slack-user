@@ -67,14 +67,11 @@ async function fetchSlackUser(email, token) {
  * Main orchestration function, takes in input from github actions and sets the output to the slack member id if one was found.
  */
 (async () => {
-    const repository = core.getInput('repo');
-    const organization = core.getInput('org');
     const githubToken = core.getInput('github-token');
-    const ref = core.getInput('ref');
     const slackToken = core.getInput('slack-token');
 
     // Retrieve the user's email in GitHub
-    const email = await fetchGitHubEmail(repository, organization, ref, githubToken);
+    const email = await fetchGitHubEmail(githubToken);
     if (!email) {
         core.setFailed(`Failed to set email for github user ${username}`);
         return;
