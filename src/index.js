@@ -1,29 +1,29 @@
-const { WebClient } = require('@slack/web-api');
-const core = require('@actions/core');
-const github = require('@actions/github');
+import * as core from '@actions/core';
+import { WebClient } from '@slack/web-api';
+import { context, getOctokit } from '@actions/github';
 
 /**
  * Given a user's username in GitHub the user's email is retrieved
- * @param {*} username A username associated with a user in GitHub.
  * @param {*} token GitHub Personal Access Token, used to interact with the GitHub REST API
  * @returns The GitHub user's email address
  */
-async function fetchGitHubEmail(repo, owner, ref, token) {
+async function fetchGitHubEmail(token) {
     try {
-        const octokit = github.getOctokit(token);
+        const octokit = getOctokit(token);
         const data = await octokit.rest.repos.getCommit({
-            owner,
-            repo,
-            ref
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            ref: context.ref
         });
+
         if (!data) {
-            core.setFailed(`Failed to retrieve commit for ${ref}`);
+            core.setFailed('An error occurred fetching the commit from GitHub');
             return undefined;
         }
-        const email = data.commit.author.email;
+        core.debug(`commit: ${JSON.stringify(data)}`);
+        const email = data.data.commit.author.email;
         if (!email) {
-            core.setFailed(`Failed to retrieve author of ${ref}`);
-            return undefined;
+            core.setFailed("Could not find an email address associated with the commit");
         }
         return email;
     } catch (err) {
