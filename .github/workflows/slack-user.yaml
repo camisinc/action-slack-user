@@ -14,7 +14,7 @@ jobs:
       - name: Checkout Branch
         uses: actions/checkout@v3
         with:
-          ref: ${{ github.sha }}
+          ref: ${{ github.ref }}
           fetch-depth: 0
 
       # Run the action defined in the repo
