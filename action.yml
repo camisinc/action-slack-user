@@ -2,15 +2,9 @@ name: Slack Username
 description: Fetch Slack Username by GitHub Associated Email
 author: 'Camis Inc'
 inputs:
-  repo:
-    description: The name of the repository this action is running on
-    required: true
-  org:
-    description: The name of the organization that owns the repo using this action
-    required: true
-  ref:
-    description: The commit ref that triggered this action
-    required: true
+  username:
+    description: The username of the user in Github
+    required: false
   github-token:
     description: The github token used to retrieve information about the provided GitHub user 
     required: true

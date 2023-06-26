@@ -22,9 +22,6 @@ jobs:
         id: user
         uses: ./
         with:
-          repo: 'action-slack-user'
-          org: 'camisinc'
-          ref: ${{ github.ref }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
           slack-token: ${{ secrets.SLACK_TOKEN }}
       - run: echo "slack member id - ${{ steps.user.outputs.slack-id }}"

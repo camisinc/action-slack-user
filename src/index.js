@@ -13,7 +13,7 @@ async function fetchGitHubEmail(token) {
         const data = await octokit.rest.repos.getCommit({
             owner: context.repo.owner,
             repo: context.repo.repo,
-            ref: context.ref
+            ref: context.sha
         });
 
         if (!data) {

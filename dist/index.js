@@ -18904,7 +18904,7 @@ async function fetchGitHubEmail(token) {
         const data = await octokit.rest.repos.getCommit({
             owner: _actions_github__WEBPACK_IMPORTED_MODULE_2__.context.repo.owner,
             repo: _actions_github__WEBPACK_IMPORTED_MODULE_2__.context.repo.repo,
-            ref: _actions_github__WEBPACK_IMPORTED_MODULE_2__.context.ref
+            ref: _actions_github__WEBPACK_IMPORTED_MODULE_2__.context.sha
         });
 
         if (!data) {
