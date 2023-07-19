@@ -1,0 +1,42 @@
+# To get started with Dependabot version updates, you'll need to specify which
+# package ecosystems to update and where the package manifests are located.
+# Please see the documentation for all configuration options:
+# https://docs.github.com/github/administering-a-repository/configuration-options-for-dependency-updates
+
+version: 2
+updates:
+  # GitHub Actions Dependency updates
+  - package-ecosystem: "github-actions" # See documentation for possible values
+    directory: "/" # Location of package manifests
+    schedule:
+      interval: "weekly"
+      time: "22:00"
+      timezone: "America/Toronto"
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+    ignore: # Ignore major updates, those will be done manually
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+    target-branch: "main"
+    reviewers:
+      - "@api-owners"
+
+  # Api nuget package updates
+  - package-ecosystem: "npm"
+    directory: "/" # Location of package manifests
+    schedule:
+      interval: "weekly"
+      time: "22:00"
+      timezone: "America/Toronto"
+    groups:
+      npm:
+        patterns:
+          - "*"
+    ignore: # ignore major updates, those will be done manually
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+    target-branch: "main"
+    reviewers:
+      - "@api-owners"
