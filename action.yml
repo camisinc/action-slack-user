@@ -1,10 +1,6 @@
 name: Slack Username
 description: Fetch Slack Username by GitHub Associated Email
-author: 'Camis Inc'
 inputs:
-  username:
-    description: The username of the user in GitHub to fetch in Slack
-    required: optional
   github-token:
     description: The github token used to retrieve information about the provided GitHub user 
     required: true

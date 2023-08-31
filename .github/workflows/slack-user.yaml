@@ -22,7 +22,6 @@ jobs:
         id: user
         uses: ./
         with:
-          username: ${{ github.actor }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
           slack-token: ${{ secrets.SLACK_TOKEN }}
       - run: echo "slack member id - ${{ steps.user.outputs.slack-id }}"

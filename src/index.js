@@ -45,15 +45,13 @@ async function fetchSlackUser(email, token) {
         // Initialize an instance of the slack web client.
         const web = new WebClient(token);
 
-        // Fetch all slack users
-        const result = await web.users.list();
+        const result = await web.users.lookupByEmail({ email });
         if (!result.ok) {
-            core.setFailed('An error occurred fetching users from slack');
+            core.setFailed(`An error occurred fetching user from slack: ${result.error}`);
             return undefined;
         }
 
-        // Find the slack user associated with the github email address
-        const user = result.members.find(member => member.profile.email === email);
+        const user = result.user;
         if (!user) {
             core.setFailed(`Could not find an associated slack user ${email}`);
             return undefined;
