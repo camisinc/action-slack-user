@@ -18909,14 +18909,14 @@ async function fetchGitHubEmail(token) {
         });
 
         if (!data) {
-            _actions_core__WEBPACK_IMPORTED_MODULE_0__.setFailed('An error occurred fetching the commit from GitHub');
+            _actions_core__WEBPACK_IMPORTED_MODULE_0__.error('An error occurred fetching the commit from GitHub');
             return undefined;
         }
         _actions_core__WEBPACK_IMPORTED_MODULE_0__.debug(`commit: ${JSON.stringify(data)}`);
         // Retrieve the email address associated with the commit
         const email = data.data.commit.author.email;
         if (!email) {
-            _actions_core__WEBPACK_IMPORTED_MODULE_0__.setFailed("Could not find an email address associated with the commit");
+            _actions_core__WEBPACK_IMPORTED_MODULE_0__.error("Could not find an email address associated with the commit");
         }
         return email;
     } catch (err) {
@@ -18938,13 +18938,13 @@ async function fetchSlackUser(email, token) {
 
         const result = await web.users.lookupByEmail({ email });
         if (!result.ok) {
-            _actions_core__WEBPACK_IMPORTED_MODULE_0__.setFailed(`An error occurred fetching user from slack: ${result.error}`);
+            _actions_core__WEBPACK_IMPORTED_MODULE_0__.error(`An error occurred fetching user from slack: ${result.error}`);
             return undefined;
         }
 
         const user = result.user;
         if (!user) {
-            _actions_core__WEBPACK_IMPORTED_MODULE_0__.setFailed(`Could not find an associated slack user ${email}`);
+            _actions_core__WEBPACK_IMPORTED_MODULE_0__.error(`Could not find an associated slack user ${email}`);
             return undefined;
         }
         return { memberId: user.id, username: user.name};
@@ -18952,6 +18952,45 @@ async function fetchSlackUser(email, token) {
         _actions_core__WEBPACK_IMPORTED_MODULE_0__.setFailed(`error: ${err}`)
         return undefined;
     }
+}
+
+/**
+ * Takes a string in the shape name.surname@company.com
+ * and returns it as nsurname@company.com
+ * otherwise undefined.
+ */
+function transformCorporateEmail(email) {
+    const emailParts = email.split("@");
+    const emailRecipient = emailParts[0];
+    const emailDomain = emailParts[1];
+    if (emailRecipient.split('.').length != 2) {
+        _actions_core__WEBPACK_IMPORTED_MODULE_0__.debug(`Did not transform corp email because more than one '.' found: ${email}`);
+        return undefined;
+    }
+
+    if (emailRecipient.includes(".")) {
+        const parts = emailRecipient.split(".");
+        const name = parts[0];
+        const surname = parts[1];
+        return name.substring(0, 1) + surname + "@" + emailDomain;
+    }
+    return undefined;
+}
+
+async function fetchSlackUserManipulatingEmail(email, token) {
+    const candidates = [email];
+    const corpEmail = transformCorporateEmail(email);
+    if (corpEmail) {
+        candidates.push(corpEmail);
+    }
+    for (const candidate of candidates) {
+        const slackUser = await fetchSlackUser(candidate, token);
+        _actions_core__WEBPACK_IMPORTED_MODULE_0__.info(`Slack user for candidate address '${candidate}' was '${slackUser}'.`);
+        if (slackUser) {
+            return slackUser;
+        }
+    }
+    return undefined;
 }
 
 /**
@@ -18969,7 +19008,7 @@ async function fetchSlackUser(email, token) {
     }
     
     // Retrieve the user's member id in slack
-    const slackUser = await fetchSlackUser(email, slackToken);
+    const slackUser = await fetchSlackUserManipulatingEmail(email, slackToken);
     if (!slackUser) {
         _actions_core__WEBPACK_IMPORTED_MODULE_0__.setFailed(`An error occurred fetching user from slack with email ${email}`);
         return;
