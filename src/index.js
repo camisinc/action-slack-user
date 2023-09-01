@@ -64,6 +64,45 @@ async function fetchSlackUser(email, token) {
 }
 
 /**
+ * Takes a string in the shape name.surname@company.com
+ * and returns it as nsurname@company.com
+ * otherwise undefined.
+ */
+function transformCorporateEmail(email) {
+    const emailParts = email.split("@");
+    const emailRecipient = emailParts[0];
+    const emailDomain = emailParts[1];
+    if (emailRecipient.split('.').length != 2) {
+        core.debug(`Did not transform corp email because more than one '.' found: ${email}`);
+        return undefined;
+    }
+
+    if (emailRecipient.includes(".")) {
+        const parts = emailRecipient.split(".");
+        const name = parts[0];
+        const surname = parts[1];
+        return name.substring(0, 1) + surname + "@" + emailDomain;
+    }
+    return undefined;
+}
+
+async function fetchSlackUserManipulatingEmail(email, token) {
+    const candidates = [email];
+    const corpEmail = transformCorporateEmail(email);
+    if (corpEmail) {
+        candidates.push(corpEmail);
+    }
+    for (const candidate of candidates) {
+        const slackUser = await fetchSlackUser(candidate, token);
+        core.info(`Slack user for candidate address '${candidate}' was '${slackUser}'.`);
+        if (slackUser) {
+            return slackUser;
+        }
+    }
+    return undefined;
+}
+
+/**
  * Main orchestration function, takes in input from github actions and sets the output to the slack member id if one was found.
  */
 (async () => {
@@ -78,7 +117,7 @@ async function fetchSlackUser(email, token) {
     }
     
     // Retrieve the user's member id in slack
-    const slackUser = await fetchSlackUser(email, slackToken);
+    const slackUser = await fetchSlackUserManipulatingEmail(email, slackToken);
     if (!slackUser) {
         core.setFailed(`An error occurred fetching user from slack with email ${email}`);
         return;
