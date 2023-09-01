@@ -94,7 +94,7 @@ async function fetchSlackUserManipulatingEmail(email, token) {
     }
     for (const candidate of candidates) {
         const slackUser = await fetchSlackUser(candidate, token);
-        core.info(`Slack user for candidate address '${candidate}' was '${slackUser}'.`);
+        core.info(`Slack user for candidate address '${candidate}' was '${JSON.stringify(slackUser)}'.`);
         if (slackUser) {
             return slackUser;
         }
