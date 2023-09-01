@@ -18,14 +18,14 @@ async function fetchGitHubEmail(token) {
         });
 
         if (!data) {
-            core.setFailed('An error occurred fetching the commit from GitHub');
+            core.error('An error occurred fetching the commit from GitHub');
             return undefined;
         }
         core.debug(`commit: ${JSON.stringify(data)}`);
         // Retrieve the email address associated with the commit
         const email = data.data.commit.author.email;
         if (!email) {
-            core.setFailed("Could not find an email address associated with the commit");
+            core.error("Could not find an email address associated with the commit");
         }
         return email;
     } catch (err) {
@@ -47,13 +47,13 @@ async function fetchSlackUser(email, token) {
 
         const result = await web.users.lookupByEmail({ email });
         if (!result.ok) {
-            core.setFailed(`An error occurred fetching user from slack: ${result.error}`);
+            core.error(`An error occurred fetching user from slack: ${result.error}`);
             return undefined;
         }
 
         const user = result.user;
         if (!user) {
-            core.setFailed(`Could not find an associated slack user ${email}`);
+            core.error(`Could not find an associated slack user ${email}`);
             return undefined;
         }
         return { memberId: user.id, username: user.name};
