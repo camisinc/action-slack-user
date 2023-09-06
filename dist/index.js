@@ -18985,7 +18985,7 @@ async function fetchSlackUser(email, token) {
         _actions_core__WEBPACK_IMPORTED_MODULE_0__.setFailed(`Failed to find email associated with commit`);
         return;
     }
-    
+
     if (email.includes('dependabot[bot]@users.noreply.github.com')) {
         _actions_core__WEBPACK_IMPORTED_MODULE_0__.setOutput('member-id', 'dependabot');
         _actions_core__WEBPACK_IMPORTED_MODULE_0__.setOutput('username', 'dependabot');
