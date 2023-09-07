@@ -55,7 +55,7 @@ async function fetchSlackUser(email, token) {
         // Find the slack user associated with the github email address
         const user = result.user;
         if (!user) {
-            core.setFailed(`Could not find an associated slack user ${email}`);
+            core.setFailed(`Could not find an associated slack user ${email} ${result}`);
             return undefined;
         }
         return { memberId: user.id, username: user.name};
