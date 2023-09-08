@@ -103,6 +103,18 @@ async function fetchSlackUserManipulatingEmail(email, token) {
 }
 
 /**
+ * A GitHub user can decide to set their email as private, and not share the actual address publicly.
+ * https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-personal-account-on-github/managing-email-preferences/setting-your-commit-email-address
+ * 
+ * In these situations, GitHub will set the used actor email as either USERNAME@users.noreply.github.com or ID+USERNAME@users.noreply.github.com
+ */
+function isGitHubUserEmailPrivate(email) {
+    const emailParts = email.split("@");
+    const emailDomain = emailParts[1];
+    return emailDomain === "users.noreply.github.com";
+}
+
+/**
  * Main orchestration function, takes in input from github actions and sets the output to the slack member id if one was found.
  */
 (async () => {
@@ -112,7 +124,12 @@ async function fetchSlackUserManipulatingEmail(email, token) {
     // Retrieve the user's email in GitHub
     const email = await fetchGitHubEmail(githubToken);
     if (!email) {
-        core.setFailed(`Failed to find email associated with commit`);
+        core.setFailed(`Failed to find email associated with commit ${context.sha}`);
+        return;
+    }
+
+    if (isGitHubUserEmailPrivate(email)) {
+        core.info(`The GitHub user set their email as private: ${email}`);
         return;
     }
     
