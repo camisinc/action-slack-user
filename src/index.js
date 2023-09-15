@@ -46,16 +46,16 @@ async function fetchSlackUser(email, token) {
         const web = new WebClient(token);
 
         // Fetch all slack users
-        const result = await web.users.list();
+        const result = await web.users.lookupByEmail({ email });
         if (!result.ok) {
-            core.setFailed('An error occurred fetching users from slack');
+            core.setFailed(`An error occurred fetching user from slack: ${result.error}`);
             return undefined;
         }
 
         // Find the slack user associated with the github email address
-        const user = result.members.find(member => member.profile.email === email);
+        const user = result.user;
         if (!user) {
-            core.setFailed(`Could not find an associated slack user ${email}`);
+            core.setFailed(`Could not find an associated slack user ${email} ${result}`);
             return undefined;
         }
         return { memberId: user.id, username: user.name};
@@ -78,7 +78,13 @@ async function fetchSlackUser(email, token) {
         core.setFailed(`Failed to find email associated with commit`);
         return;
     }
-    
+
+    if (email.includes('dependabot[bot]@users.noreply.github.com')) {
+        core.setOutput('member-id', 'dependabot');
+        core.setOutput('username', 'dependabot');
+        return;
+    }
+
     // Retrieve the user's member id in slack
     const slackUser = await fetchSlackUser(email, slackToken);
     if (!slackUser) {
