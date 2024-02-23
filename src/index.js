@@ -79,6 +79,7 @@ async function fetchSlackUser(email, token) {
         return;
     }
 
+    // special case for dependabot pull requests
     if (email.includes('dependabot[bot]@users.noreply.github.com')) {
         core.setOutput('member-id', 'dependabot');
         core.setOutput('username', 'dependabot');
