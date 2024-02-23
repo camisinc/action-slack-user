@@ -1,6 +1,8 @@
-import * as core from '@actions/core';
-import { WebClient } from '@slack/web-api';
-import { context, getOctokit } from '@actions/github';
+const core = require('@actions/core');
+const github = require('@actions/github');
+const WebClient = require('@slack/web-api').WebClient;
+const context = github.context;
+const getOctokit = github.getOctokit;
 
 /**
  * Given a user's username in GitHub the user's email is retrieved
