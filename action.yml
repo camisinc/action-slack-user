@@ -18,7 +18,7 @@ outputs:
     description: The matching Slack user's username
 runs:
   using: node20
-  main: index.js
+  main: dist/index.js
 branding:
   icon: 'at-sign'
   color: 'green'

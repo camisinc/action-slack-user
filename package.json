@@ -5,7 +5,8 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node src/index.js",
+    "package": "ncc build src/index.js -o dist"
   },
   "keywords": [],
   "author": "",
@@ -15,5 +16,8 @@
     "@actions/github": "^6.0.0",
     "@octokit/rest": "^20.0.2",
     "@slack/web-api": "^7.0.2"
+  },
+  "devDependencies": {
+    "@vercel/ncc": "^0.38.1"
   }
 }
