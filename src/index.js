@@ -57,7 +57,7 @@ async function fetchGitHubEmailByUsername(username, token) {
 
         const email = user.email;
         if (!email) {
-            core.setFailed("Could not find an email address associated with the commit");
+            core.setFailed(`Could not find an email address associated with the user ${username}`);
         }
         return email;
     } catch (err) {
