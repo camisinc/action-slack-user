@@ -105,8 +105,8 @@ async function fetchSlackUser(email, token) {
     const username = core.getInput('username');
 
     const email = username ?
-        fetchGitHubEmailByUsername(username, githubToken) :
-        fetchGitHubEmailByContextSha(githubToken);
+        await fetchGitHubEmailByUsername(username, githubToken) :
+        await fetchGitHubEmailByContextSha(githubToken);
 
     if (!email) {
         core.setFailed(`Failed to find GitHub user's email`);

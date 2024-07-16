@@ -20890,8 +20890,8 @@ async function fetchSlackUser(email, token) {
     const username = _actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput('username');
 
     const email = username ?
-        fetchGitHubEmailByUsername(username, githubToken) :
-        fetchGitHubEmailByContextSha(githubToken);
+        await fetchGitHubEmailByUsername(username, githubToken) :
+        await fetchGitHubEmailByContextSha(githubToken);
 
     if (!email) {
         _actions_core__WEBPACK_IMPORTED_MODULE_0__.setFailed(`Failed to find GitHub user's email`);
