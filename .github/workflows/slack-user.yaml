@@ -18,11 +18,22 @@ jobs:
           fetch-depth: 0
 
       # Run the action defined in the repo
-      - name: Fetch Slack User
-        id: user
+      - name: Fetch Slack User By Username
+        id: get-by-username
         uses: ./
         with:
           username: ${{ github.actor }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
           slack-token: ${{ secrets.SLACK_TOKEN }}
-      - run: echo "slack username - ${{ steps.user.outputs.username }}"
+
+      - run: echo "slack username - ${{ steps.get-by-username.outputs.username }}"
+
+      # Run the action defined in the repo
+      - name: Fetch Slack User By Context
+        id: get-by-context
+        uses: ./
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          slack-token: ${{ secrets.SLACK_TOKEN }}
+
+      - run: echo "slack username - ${{ steps.get-by-context.outputs.username }}"
