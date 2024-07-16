@@ -20807,7 +20807,7 @@ async function fetchGitHubEmailByContextSha(token) {
             _actions_core__WEBPACK_IMPORTED_MODULE_0__.setFailed('An error occurred fetching the commit from GitHub');
             return undefined;
         }
-        _actions_core__WEBPACK_IMPORTED_MODULE_0__.debug(`commit: ${JSON.stringify(data)}`);
+
         // Retrieve the email address associated with the commit
         const email = data.data.commit.author.email;
         if (!email) {
@@ -20830,7 +20830,6 @@ async function fetchGitHubEmailByUsername(username, token) {
     try {
         const octokit = (0,_actions_github__WEBPACK_IMPORTED_MODULE_2__.getOctokit)(token);
 
-        // Fetch commit from GitHub
         const { data: user } = await octokit.rest.users.getByUsername({
             username
         });

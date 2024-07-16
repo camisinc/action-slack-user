@@ -22,7 +22,7 @@ async function fetchGitHubEmailByContextSha(token) {
             core.setFailed('An error occurred fetching the commit from GitHub');
             return undefined;
         }
-        core.debug(`commit: ${JSON.stringify(data)}`);
+
         // Retrieve the email address associated with the commit
         const email = data.data.commit.author.email;
         if (!email) {
@@ -45,7 +45,6 @@ async function fetchGitHubEmailByUsername(username, token) {
     try {
         const octokit = getOctokit(token);
 
-        // Fetch commit from GitHub
         const { data: user } = await octokit.rest.users.getByUsername({
             username
         });
