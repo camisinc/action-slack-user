@@ -20,8 +20,6 @@ updates:
       - dependency-name: "*"
         update-types: ["version-update:semver-major"]
     target-branch: "main"
-    reviewers:
-      - "@api-owners"
 
   # Api nuget package updates
   - package-ecosystem: "npm"
@@ -38,5 +36,3 @@ updates:
       - dependency-name: "*"
         update-types: ["version-update:semver-major"]
     target-branch: "main"
-    reviewers:
-      - "@api-owners"
