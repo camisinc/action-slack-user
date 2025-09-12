@@ -19,26 +19,22 @@ jobs:
 
     steps:
       - name: Checkout Branch
-        uses: actions/checkout@v3
+        uses: actions/checkout@v5
         with:
           ref: ${{ github.sha }}
           fetch-depth: 0
 
       - name: Install GitVersion Tool
-        uses: gittools/actions/gitversion/setup@v0.13.6
+        uses: gittools/actions/gitversion/setup@b82e662a7199df56ac962118e506d9efb9830f82
         with:
-          versionSpec: '5.8.1'
+          versionSpec: '6.3.0'
 
       - name: Calculate SemVer
         id:   gitversion
-        uses: gittools/actions/gitversion/execute@v0.13.6
+        uses: gittools/actions/gitversion/execute@b82e662a7199df56ac962118e506d9efb9830f82
         with:
-          useConfigFile: true
           configFilePath: GitVersion.yml
 
-      - name: Create Release
-        uses: softprops/action-gh-release@v1
-        with:
-          target_commitish: ${{ github.sha }}
-          tag_name: v${{ steps.gitversion.outputs.semVer }}
-          generate_release_notes: true
+      - name: Create a release for new tag
+        run: |
+          gh release create ${{ steps.gitversion.outputs.majorMinorPatch }} --title "${{ steps.gitversion.outputs.majorMinorPatch }}" --generate-notes
