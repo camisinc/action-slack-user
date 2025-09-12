@@ -12,11 +12,11 @@
   "license": "ISC",
   "dependencies": {
     "@actions/core": "^1.11.1",
-    "@actions/github": "^5.1.1",
-    "@octokit/rest": "^20.1.1",
-    "@slack/web-api": "^6.13.0"
+    "@actions/github": "^6.0.1",
+    "@octokit/rest": "^22.0.0",
+    "@slack/web-api": "^7.10.0"
   },
   "devDependencies": {
-    "@vercel/ncc": "^0.38.2"
+    "@vercel/ncc": "^0.38.3"
   }
 }
