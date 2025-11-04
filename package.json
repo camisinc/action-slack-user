@@ -13,10 +13,10 @@
   "dependencies": {
     "@actions/core": "^1.11.1",
     "@actions/github": "^6.0.1",
-    "@octokit/rest": "^22.0.0",
-    "@slack/web-api": "^7.10.0"
+    "@octokit/rest": "^22.0.1",
+    "@slack/web-api": "^7.12.0"
   },
   "devDependencies": {
-    "@vercel/ncc": "^0.38.3"
+    "@vercel/ncc": "^0.38.4"
   }
 }
