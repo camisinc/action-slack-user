@@ -25,13 +25,13 @@ jobs:
           fetch-depth: 0
 
       - name: Install GitVersion Tool
-        uses: gittools/actions/gitversion/setup@b82e662a7199df56ac962118e506d9efb9830f82
+        uses: gittools/actions/gitversion/setup@d0139503a9321f76b4a417dfdc8aebcec24decdd
         with:
           versionSpec: '6.3.0'
 
       - name: Calculate SemVer
         id:   gitversion
-        uses: gittools/actions/gitversion/execute@b82e662a7199df56ac962118e506d9efb9830f82
+        uses: gittools/actions/gitversion/execute@d0139503a9321f76b4a417dfdc8aebcec24decdd
         with:
           configFilePath: GitVersion.yml
 
