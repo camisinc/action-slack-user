@@ -54,9 +54,13 @@ async function fetchGitHubEmailByUsername(username, token) {
             return undefined;
         }
 
-        const email = user.email;
+        let email = user.email;
         if (!email) {
-            core.setFailed(`Could not find an email address associated with the user ${username}`);
+            // If the email is not found, try to fetch it from the context SHA as fallback
+            email = await fetchGitHubEmailByContextSha(token);
+            if (!email) {
+                return undefined;
+            }
         }
         return email;
     } catch (err) {
@@ -116,6 +120,12 @@ async function fetchSlackUser(email, token) {
     if (email.includes('dependabot[bot]@users.noreply.github.com')) {
         core.setOutput('member-id', 'dependabot');
         core.setOutput('username', 'dependabot');
+        return;
+    } else if (email.includes('noreply.github.com')) {
+        // If the email is a noreply/private email, just pass the action through and set the outputs to the noreply user
+        core.info(`User email is a noreply email, which is not allowed`);
+        core.setOutput('member-id', 'noreply');
+        core.setOutput('username', 'noreply');
         return;
     }
 
