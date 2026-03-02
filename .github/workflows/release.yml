@@ -36,5 +36,7 @@ jobs:
           configFilePath: GitVersion.yml
 
       - name: Create a release for new tag
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh release create ${{ steps.gitversion.outputs.majorMinorPatch }} --title "${{ steps.gitversion.outputs.majorMinorPatch }}" --generate-notes
