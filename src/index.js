@@ -11,11 +11,15 @@ async function fetchGitHubEmailByContextSha(token) {
     try {
         const octokit = getOctokit(token);
 
+        // For pull requests, use the PR head SHA instead of context.sha
+        // context.sha points to the merge commit or base branch in PR contexts
+        const sha = context.payload.pull_request?.head?.sha || context.sha;
+
         // Fetch commit from GitHub
         const data = await octokit.rest.repos.getCommit({
             owner: context.repo.owner,
             repo: context.repo.repo,
-            ref: context.sha
+            ref: sha
         });
 
         if (!data) {
