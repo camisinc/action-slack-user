@@ -19,19 +19,19 @@ jobs:
 
     steps:
       - name: Checkout Branch
-        uses: actions/checkout@v5
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           ref: ${{ github.sha }}
           fetch-depth: 0
 
       - name: Install GitVersion Tool
-        uses: gittools/actions/gitversion/setup@b82e662a7199df56ac962118e506d9efb9830f82
+        uses: gittools/actions/gitversion/setup@e0d584e657c606912e8fd522aeed29025975705f # v4.4.2
         with:
           versionSpec: '6.3.0'
 
       - name: Calculate SemVer
         id:   gitversion
-        uses: gittools/actions/gitversion/execute@b82e662a7199df56ac962118e506d9efb9830f82
+        uses: gittools/actions/gitversion/execute@e0d584e657c606912e8fd522aeed29025975705f # v4.4.2
         with:
           configFilePath: GitVersion.yml
 
