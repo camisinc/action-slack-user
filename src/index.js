@@ -5,15 +5,27 @@ import { context, getOctokit } from '@actions/github';
 /**
  * Fetch GitHub user's email based on the SHA associated with the current GitHub Action context
  * @param {*} token GitHub Personal Access Token, used to interact with the GitHub REST API
- * @returns The GitHub user's email address
+ * @returns The GitHub user's email address, or undefined if not found or an error occurs
  */
 async function fetchGitHubEmailByContextSha(token) {
     try {
         const octokit = getOctokit(token);
 
-        // For pull requests, use the PR head SHA instead of context.sha
-        // context.sha points to the merge commit or base branch in PR contexts
-        const sha = context.payload.pull_request?.head?.sha || context.sha;
+        // Determine the correct SHA based on event type
+        let sha;
+        if (context.payload.pull_request) {
+            // Direct pull_request event
+            sha = context.payload.pull_request.head.sha;
+            core.info(`Using pull_request.head.sha: ${sha}`);
+        } else if (context.payload.check_suite) {
+            // check_suite event (e.g., when checks complete on a PR)
+            sha = context.payload.check_suite.head_sha;
+            core.info(`Using check_suite.head_sha: ${sha}`);
+        } else {
+            // Fallback to context.sha for other events (push, etc.)
+            sha = context.sha;
+            core.info(`Using context.sha: ${sha}`);
+        }
 
         // Fetch commit from GitHub
         const data = await octokit.rest.repos.getCommit({
@@ -23,18 +35,20 @@ async function fetchGitHubEmailByContextSha(token) {
         });
 
         if (!data) {
-            core.setFailed('An error occurred fetching the commit from GitHub');
+            core.error('An error occurred fetching the commit from GitHub');
             return undefined;
         }
 
         // Retrieve the email address associated with the commit
         const email = data.data.commit.author.email;
         if (!email) {
-            core.setFailed("Could not find an email address associated with the commit");
+            core.error("Could not find an email address associated with the commit");
+            return undefined;
         }
+
         return email;
     } catch (err) {
-        core.setFailed(`error: ${err}`);
+        core.error(`Failed to fetch commit: ${err.message}`);
         return undefined;
     }
 }
@@ -43,7 +57,7 @@ async function fetchGitHubEmailByContextSha(token) {
  * Fetch GitHub user's email based on the provided GitHub username
  * @param {*} username The GitHub user's login
  * @param {*} token GitHub Personal Access Token, used to interact with the GitHub REST API
- * @returns The GitHub user's email address
+ * @returns The GitHub user's email address, or undefined if not found/public
  */
 async function fetchGitHubEmailByUsername(username, token) {
     try {
@@ -54,72 +68,80 @@ async function fetchGitHubEmailByUsername(username, token) {
         });
 
         if (!user) {
-            core.setFailed('An error occurred fetching the user from GitHub');
+            core.warning('Could not fetch user from GitHub - user may not exist');
             return undefined;
         }
 
-        let email = user.email;
-        if (!email) {
-            // If the email is not found, try to fetch it from the context SHA as fallback
-            email = await fetchGitHubEmailByContextSha(token);
-            if (!email) {
-                return undefined;
-            }
+        if (!user.email) {
+            core.warning(`User '${username}' has no public email available`);
+            return undefined;
         }
-        return email;
+
+        return user.email;
     } catch (err) {
-        core.setFailed(`error: ${err}`);
+        core.warning(`Failed to fetch user by username: ${err.message}`);
         return undefined;
     }
 }
 
 /**
- * Uses a user's email address in slack to determine the user's username
+ * Uses a user's email address in Slack to determine the user's username
  * @param {*} email The email address associated with a user in Slack
- * @param {*} token A Slack API Token used to retrieve user's from a slack organization.
- * @returns A username in slack that's associated with the provided email
+ * @param {*} token A Slack API Token used to retrieve users from a Slack organization.
+ * @returns A username in Slack that's associated with the provided email
  */
 async function fetchSlackUser(email, token) {
     try {
-        // Initialize an instance of the slack web client.
+        // Initialize an instance of the Slack web client.
         const web = new WebClient(token);
 
-        // Fetch all slack users
         const result = await web.users.lookupByEmail({ email });
         if (!result.ok) {
-            core.setFailed(`An error occurred fetching user from slack: ${result.error}`);
+            core.error(`An error occurred fetching user from Slack: ${result.error}`);
             return undefined;
         }
 
-        // Find the slack user associated with the github email address
         const user = result.user;
         if (!user) {
-            core.setFailed(`Could not find an associated slack user ${email} ${result}`);
+            core.error(`Could not find an associated Slack user for email: ${email}`);
             return undefined;
         }
+
         return { memberId: user.id, username: user.name};
     } catch (err) {
-        core.setFailed(`error: ${err}`)
+        core.error(`Failed to fetch Slack user: ${err.message}`);
         return undefined;
     }
 }
 
 /**
- * Main orchestration function, takes in input from github actions and sets the output to the slack member id if one was found.
+ * Main orchestration function, takes in input from GitHub Actions and sets the output to the Slack member id if one was found.
  */
 (async () => {
     const githubToken = core.getInput('github-token');
     const slackToken = core.getInput('slack-token');
     const username = core.getInput('username');
 
-    const email = username ?
-        await fetchGitHubEmailByUsername(username, githubToken) :
-        await fetchGitHubEmailByContextSha(githubToken);
+    let email;
+
+    if (username) {
+        email = await fetchGitHubEmailByUsername(username, githubToken);
+
+        // If username lookup didn't return an email, try to fetch from context as a fallback
+        if (!email) {
+            core.info(`Username '${username}' has no public email, falling back to context SHA`);
+            email = await fetchGitHubEmailByContextSha(githubToken);
+        }
+    } else {
+        email = await fetchGitHubEmailByContextSha(githubToken);
+    }
 
     if (!email) {
         core.setFailed(`Failed to find GitHub user's email`);
         return;
     }
+
+    core.info(`GitHub user email: ${email}`);
 
     if (email.includes('dependabot[bot]@users.noreply.github.com')) {
         core.setOutput('member-id', 'dependabot');
@@ -133,10 +155,10 @@ async function fetchSlackUser(email, token) {
         return;
     }
 
-    // Retrieve the user's member id in slack
+    // Retrieve the user's member id in Slack
     const slackUser = await fetchSlackUser(email, slackToken);
     if (!slackUser) {
-        core.setFailed(`An error occurred fetching user from slack with email ${email}`);
+        core.setFailed(`An error occurred fetching user from Slack with email ${email}`);
         return;
     }
 
