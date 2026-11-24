@@ -1,40 +1,44 @@
+calculation:
+  branches:
+    main:
+      increment: Patch
+      is-main-branch: true
+      is-release-branch: false
+      is-source-branch-for: []
+      label: ''
+      prevent-increment:
+        of-merged-branch: false
+      regex: "^master$|^main$"
+      source-branches: []
+      track-merge-message: true
+      track-merge-target: true
+      tracks-release-branches: false
+  commit-message-incrementing: MergeMessageOnly
+  increment: Inherit
+  label: "{BranchName}"
+  major-version-bump-message: "\\+semver:\\s?(breaking|major)"
+  merge-message-formats: {}
+  minor-version-bump-message: "\\+semver:\\s?(feature|minor)"
+  mode: ContinuousDelivery
+  no-bump-message: "\\+semver:\\s?(none|skip)"
+  patch-version-bump-message: "\\+semver:\\s?(fix|patch)"
+  prevent-increment:
+    of-merged-branch: false
+    when-branch-merged: false
+    when-current-commit-tagged: true
+  semantic-version-format: Strict
+  strategies:
+    - MergeMessage
+    - TaggedCommit
+  track-merge-message: true
+  track-merge-target: true
+output:
+  assembly-file-versioning-scheme: MajorMinorPatch
+  assembly-versioning-scheme: MajorMinorPatch
+  branches:
+    main:
+      pre-release-weight: 55000
+  commit-date-format: yyyy-MM-dd
+  tag-pre-release-weight: 60000
+  update-build-number: true
 workflow: GitHubFlow/v1
-assembly-versioning-scheme: MajorMinorPatch
-assembly-file-versioning-scheme: MajorMinorPatch
-major-version-bump-message: \+semver:\s?(breaking|major)
-minor-version-bump-message: \+semver:\s?(feature|minor)
-patch-version-bump-message: \+semver:\s?(fix|patch)
-no-bump-message: \+semver:\s?(none|skip)
-tag-pre-release-weight: 60000
-commit-date-format: yyyy-MM-dd
-merge-message-formats: {}
-update-build-number: true
-semantic-version-format: Strict
-strategies:
-- MergeMessage
-- TaggedCommit
-branches:
-  main:
-    label: ''
-    increment: Patch
-    prevent-increment:
-      of-merged-branch: false
-    track-merge-target: true
-    track-merge-message: true
-    regex: ^master$|^main$
-    source-branches: []
-    is-source-branch-for: []
-    tracks-release-branches: false
-    is-release-branch: false
-    is-main-branch: true
-    pre-release-weight: 55000
-mode: ContinuousDelivery
-label: '{BranchName}'
-increment: Inherit
-prevent-increment:
-  of-merged-branch: false
-  when-branch-merged: false
-  when-current-commit-tagged: true
-track-merge-target: true
-track-merge-message: true
-commit-message-incrementing: MergeMessageOnly
